@@ -56,6 +56,7 @@ pipeline {
 
         stage('image') {
             steps {
+                sh 'ls'
                 sh label: 'build image', script: "nerdctl build --platform=${params.arch} --output type=image,name=${env.REGISTRY_HOST}/${env.PROJECT_NAME}/warehouse:${BUILD_NUMBER},push=true -f Dockerfile ."
             }
         }
