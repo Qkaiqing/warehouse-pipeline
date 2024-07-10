@@ -103,7 +103,7 @@ spec:
             name: warehouse
       containers:
         - name: warehouse
-          image: "{{ .Values.hub }}/warehouse:{{ .Values.tag }}"
+          image: "{{ .Values.hub }}:{{ .Values.tag }}"
           imagePullPolicy: Always
           volumeMounts:
             - name: warehouse
