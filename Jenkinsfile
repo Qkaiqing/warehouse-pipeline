@@ -62,17 +62,17 @@ pipeline {
         }
 
        
-        // stage('deploy') {
-        //     steps {
-        //         script{
-        //             if(autodeploy) {
-        //                 withKubeConfig(caCertificate: '', clusterName: 'kubernetes', contextName: 'default', credentialsId: 'kubeconfig', namespace: 'ruoyi', restrictKubeConfigAccess: false, serverUrl: 'https://172.16.115.11:6443') {
-        //                     sh "helm upgrade -i ruoyi --set hub=${env.REGISTRY_HOST}/${env.PROJECT_NAME} --set tag=${BUILD_NUMBER} ${params.opts} ruoyi --create-namespace --namespace ${env.PROJECT_NAME}-${env.PROJECT_ENV}"
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+        stage('deploy') {
+            steps {
+                script{
+                    if(autodeploy) {
+                        withKubeConfig(caCertificate: '', clusterName: 'kubernetes', contextName: 'default', credentialsId: 'kubeconfig', namespace: 'ruoyi', restrictKubeConfigAccess: false, serverUrl: 'https://172.16.115.11:6443') {
+                            sh "helm upgrade -i warehouse --set hub=${env.REGISTRY_HOST}/${env.PROJECT_NAME}/warehouse --set tag=${BUILD_NUMBER} warehouse --create-namespace --namespace ${env.PROJECT_NAME}-${env.PROJECT_ENV}"
+                        }
+                    }
+                }
+            }
+        }
     }
     // post { 
     //     cleanup{
