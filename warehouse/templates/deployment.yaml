@@ -3,7 +3,15 @@ kind: ConfigMap
 metadata:
   name: warehouse
 data:
-  config.yml: |-
+  log4j.properties: |-
+    log4j.rootLogger=DEBUG, stdout
+    # Console output...
+    log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+    log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+    log4j.appender.stdout.layout.ConversionPattern=%5p [%t] - %m%n
+  file.properties: |-
+    filepath=/app/upload
+  application.yml: |-
     #配置数据源
     spring:
       datasource:
@@ -81,6 +89,19 @@ spec:
       targetPort: 8088
 
 ---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: warehouse-vol
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 10G
+  storageClassName: "{{ .Values.storageClassName }}"
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -98,6 +119,9 @@ spec:
         app: warehouse
     spec:
       volumes:
+        - name: warehouse-vol
+          persistentVolumeClaim:
+            claimName: warehouse-vol
         - name: warehouse
           configMap:
             name: warehouse
@@ -106,9 +130,17 @@ spec:
           image: "{{ .Values.hub }}:{{ .Values.tag }}"
           imagePullPolicy: Always
           volumeMounts:
+            - name: warehouse-vol
+              mountPath: /app/upload
             - name: warehouse
-              mountPath: /app/config.yml
-              subPath: config.yml
+              mountPath: /app/log4j.properties
+              subPath: log4j.properties
+            - name: warehouse
+              mountPath: /app/file.properties
+              subPath: file.properties
+            - name: warehouse
+              mountPath: /app/application.yml
+              subPath: application.yml
           ports:
             - name: http
               containerPort: 8088

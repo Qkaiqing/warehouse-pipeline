@@ -988,6 +988,7 @@ spec:
     requests:
       storage: 10G
   storageClassName: "{{ .Values.storageClassName }}"
+
 ---
 apiVersion: apps/v1
 kind: Deployment
